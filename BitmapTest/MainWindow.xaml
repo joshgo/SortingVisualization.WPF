@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BitmapTest"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" Name="TheWindow">
     <Grid>
         <Slider Name="RefreshRate" Value="0" Minimum="0" Maximum="10" IsSnapToTickEnabled="true" ValueChanged="RefreshRate_ValueChanged" 
                 Ticks="0,1,2,3,4,5,6,7,8,9,10"
@@ -13,6 +13,10 @@
         <Image Name="TheImage" Margin="0,29,0,0">
             <Image.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Pixel Ordinal Value">
+                        <MenuItem Header="Normal (Default)" Name="_normalMenuItem" Click="OnSetOrdinalValue" CommandParameter="Normal" IsCheckable="True" IsChecked="True" />
+                        <MenuItem Header="Spiral (Clockwise)" Name="_spiralMenuItem" Click="OnSetOrdinalValue" CommandParameter="Spiral" IsCheckable="True" />
+                    </MenuItem>
                     <MenuItem Header="Load Image">
                         <MenuItem Header="Starry Night" Click="OnLoadImage" CommandParameter="Starry Night"/>
                         <MenuItem Header="Cafe Terrace" Click="OnLoadImage" CommandParameter="Cafe Terrace"/>

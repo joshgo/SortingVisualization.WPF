@@ -6,14 +6,14 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
 namespace BitmapTest
 {
+    public enum OrdinalValue { Normal, Spiral }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -37,11 +37,11 @@ namespace BitmapTest
         private volatile int _swapRateRefresh = 5000;
         private Dictionary<string, string> _resources = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private Dictionary<int, int> _sliderToRates = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> _ordinalMap = new Dictionary<int, int>();
         public int SwapRefreshRate { get; set; }
 
         public MainWindow()
         {
-
             _resources.Add("Starry Night", "pack://application:,,,/Images/starry-night.jpg");
             _resources.Add("Cafe Terrace", "pack://application:,,,/Images/van-gogh-cafe.jpg");
             _resources.Add("Self Portrait", "pack://application:,,,/Images/van-gogh-portrait.jpg");
@@ -64,6 +64,8 @@ namespace BitmapTest
             LoadImage("Starry Night");
         }
 
+        public OrdinalValue OrdinalValue { get; set; }
+
         private void Run(Action vf, string name = "")
         {
             var sw = new Stopwatch();
@@ -79,6 +81,7 @@ namespace BitmapTest
             Run(InitPositions, "InitPositions");
             Run(DrawImage, "DrawImage");
         }
+        enum Direction : int { R = 0, D, L, U };
 
         private void InitPositions()
         {
@@ -87,12 +90,83 @@ namespace BitmapTest
             var SIZE = W * H;
             _positions = new List<int>(SIZE);
 
+            if (_normalMenuItem.IsChecked)
+            {
+                InitNormalPositions();
+            }
+            else
+            {
+                InitSpiralPositions();
+            }
+            
+            for (int i = 0; i < SIZE; i++)
+            {
+                _positions.Add(i);
+                var m = _ordinalMap[i];
+                var x = m % W;
+                var y = m / W;
+                _colorMap[m] = _bmp.GetPixel(x, y);
+            }
+        }
+
+        private void InitNormalPositions()
+        {
+            var W = _bmp.Width;
+            var H = _bmp.Height;
+            var SIZE = W * H;
+            _ordinalMap.Clear();
             for(int i = 0; i < SIZE; i++)
             {
-                var x = i % W;
-                var y = i / W;
-                _positions.Add(i);
-                _colorMap[i] = _bmp.GetPixel(x, y);
+                _ordinalMap.Add(i, i);
+            }
+        }
+
+        private void InitSpiralPositions()
+        {
+            var W = _bmp.Width;
+            var H = _bmp.Height;
+            var SIZE = W * H;
+
+            Direction dir = Direction.R;
+            var x = 0;
+            var y = 0;
+
+            Func<int, int, int> pointFn = new Func<int, int, int>((x1, y1) => y1 * W + x1);
+            int TOPSIDE = 0;
+            int RIGHTSIDE = W;
+            int BOTTOMSIDE = H;
+            int LEFTSIDE = -1;
+            _ordinalMap.Clear();
+            for (int i = 0; i < SIZE; i++)
+            {
+                var p = pointFn(x, y);
+                _ordinalMap.Add(i, p);
+
+                while (true)
+                {
+                    if (dir == Direction.R && x + 1 < RIGHTSIDE)
+                        x++;
+                    else if (dir == Direction.D && y + 1 < BOTTOMSIDE)
+                        y++;
+                    else if (dir == Direction.L && x - 1 > TOPSIDE)
+                        x--;
+                    else if (dir == Direction.U && y - 1 > LEFTSIDE)
+                        y--;
+                    else
+                    {
+                        if (dir == Direction.R) RIGHTSIDE--;
+                        else if (dir == Direction.D) BOTTOMSIDE--;
+                        else if (dir == Direction.L) LEFTSIDE++;
+                        else if (dir == Direction.U) TOPSIDE++;
+
+                        int d = (int)dir;
+                        d = ++d % 4;
+                        dir = (Direction)d;
+                        continue;
+                    }
+
+                    break;
+                }
             }
         }
 
@@ -115,11 +189,14 @@ namespace BitmapTest
         {
             var W = _bmp.Width;
             var H = _bmp.Height;
+
             for (int i = 0; i < _positions.Count; i++)
             {
-                var v = _positions[i];
-                var x = i % W;
-                var y = i / W;
+                var loc = _ordinalMap[i];
+                var x = loc % W;
+                var y = loc / W;
+
+                var v = _ordinalMap[_positions[i]];
                 _bmp.SetPixel(x, y, _colorMap[v]);
             }
 
@@ -163,6 +240,21 @@ namespace BitmapTest
                 foreach (var i in TheImage.ContextMenu.Items)
                     (i as MenuItem).IsEnabled = true;
             }));
+        }
+
+        private void OnSetOrdinalValue(object sender, RoutedEventArgs e)
+        {
+            var value = (e.Source as MenuItem).CommandParameter.ToString();
+            if (value.ToString().ToUpper() == "NORMAL")
+            {
+                _normalMenuItem.IsChecked = true;
+                _spiralMenuItem.IsChecked = false;
+            }
+            else if (value.ToString().ToUpper() == "SPIRAL")
+            {
+                _normalMenuItem.IsChecked = false;
+                _spiralMenuItem.IsChecked = true;
+            }
         }
 
         private void OnLoadImage(object sender, RoutedEventArgs e)
