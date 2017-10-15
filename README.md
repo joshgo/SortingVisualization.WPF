@@ -7,6 +7,8 @@ Saw these [images](https://imgur.com/gallery/RM3wl) from a HN post, and I though
 
 * [Insertion Sort - 1](https://youtu.be/ECHz2fVbDM0)
 * [Insertion Sort - 2](https://youtu.be/rrtV4Y1mDWA)
+* [Insertion Sort - Spiral - 1](https://youtu.be/8e8YrrR1LWA)
+* [Insertion Sort - Spiral - 2](https://youtu.be/ns-0n_AhKNM)
 * [Quicksort](https://youtu.be/-fF6FpphYoA)
 * [Heapsort](https://youtu.be/btx6aXcwivs)
 
