@@ -3,8 +3,11 @@ Playing around with visualizing sorting algorithms in WPF
 
 Saw these [images](https://imgur.com/gallery/RM3wl) from a HN post, and I thought it was really interesting. So I thought I would give it a try myself, and quickly pieced together a WPF app. Most of the algorithms I found were in Stackoverflow or some tech articles. WPF is probably not ideal/optimal for animation, but it was quick to put together.
 
-## Videos
+## Screenshot
+![Insertion Sort](https://i.imgur.com/YgKZ3dA.png)
+![Insertion Sort - Spiral](https://i.imgur.com/mz8AxhO.png)
 
+## Videos
 * [Insertion Sort - 1](https://youtu.be/ECHz2fVbDM0)
 * [Insertion Sort - 2](https://youtu.be/rrtV4Y1mDWA)
 * [Insertion Sort - Spiral - 1](https://youtu.be/8e8YrrR1LWA)
